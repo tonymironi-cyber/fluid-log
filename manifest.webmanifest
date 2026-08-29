@@ -1,0 +1,1 @@
+{"name":"Fluid Log","short_name":"Fluid Log","description":"A private, offline daily fluid intake tracker.","start_url":"./","scope":"./","display":"standalone","background_color":"#edf8fb","theme_color":"#087ca7","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
