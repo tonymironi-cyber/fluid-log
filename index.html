@@ -1,1 +1,82 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#087ca7"><title>Fluid Log</title><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icon.svg"><link rel="stylesheet" href="./style.css"></head><body><main><header><div><p class="eyebrow">DAILY HYDRATION</p><h1>Fluid Log</h1></div><input id="day" type="date" aria-label="Day"></header><section class="summary"><p>Logged today</p><strong><span id="total">0</span> <small>fl oz</small></strong><div class="progress"><i id="bar"></i></div><label>Daily target <input id="goal" type="number" min="1" max="500" placeholder="Set target"> oz</label></section><section><h2>Quick add</h2><div class="quick"><button data-type="Water" data-oz="16.9">+ 16.9 Water</button><button data-type="Water" data-oz="20">+ 20 Water</button><button data-type="Powerade" data-oz="20">+ 20 Powerade</button><button data-type="Gatorade Zero" data-oz="20">+ 20 Gatorade</button></div></section><section class="card"><h2>Add a drink</h2><form id="form"><label>Drink<input id="type" required value="Water" maxlength="40"></label><label>Amount (oz)<input id="amount" required type="number" inputmode="decimal" min="0.1" max="500" step="0.1" value="16.9"></label><label>Finished at<input id="time" required type="time"></label><button class="primary">Add drink</button></form></section><section><div class="row"><h2>Daily log</h2><button id="export" class="link">Export CSV</button></div><div id="entries"></div></section><section class="card"><div class="row"><h2>Backup</h2><button id="backup" class="link">Download</button></div><label class="restore">Restore backup<input id="restore" type="file" accept="application/json"></label></section><p class="note">This tracker records what you drink. The optional target is not a medical recommendation.</p></main><script src="./app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f2f7f8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Fluid Log</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icon.svg">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<main>
+  <header>
+    <h1><svg viewBox="0 0 24 28" aria-hidden="true"><path d="M12 1C9 6 2 13 2 18a10 10 0 0 0 20 0C22 13 15 6 12 1Z" fill="currentColor"/></svg>Fluid Log</h1>
+    <div class="date-control"><input id="day" type="date" aria-label="Log date"><button id="today" class="link" hidden>Today</button></div>
+  </header>
+
+  <section class="hydration" aria-label="Daily fluid intake">
+    <p class="eyebrow" id="day-label">TODAY’S INTAKE</p>
+    <div class="bottle" id="bottle" role="progressbar" aria-label="Daily fluid intake" aria-valuemin="0" aria-valuemax="150" aria-valuenow="0">
+      <svg class="bottle-art" viewBox="0 0 220 340" aria-hidden="true">
+        <defs>
+          <linearGradient id="glass" x1="0" x2="1"><stop stop-color="#deedf2"/><stop offset=".28" stop-color="#fff" stop-opacity=".8"/><stop offset=".7" stop-color="#edf7fa"/><stop offset="1" stop-color="#c7e0e8"/></linearGradient>
+          <linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#56c9f4"/><stop offset="1" stop-color="#2377db"/></linearGradient>
+          <linearGradient id="lid" x1="0" x2="1"><stop stop-color="#183b53"/><stop offset=".5" stop-color="#355d73"/><stop offset="1" stop-color="#183b53"/></linearGradient>
+          <clipPath id="bottle-clip"><path d="M78 45H142V65C142 82 183 86 183 115V300Q183 324 159 324H61Q37 324 37 300V115C37 86 78 82 78 65Z"/></clipPath>
+        </defs>
+        <ellipse cx="110" cy="333" rx="64" ry="5" fill="#173c54" opacity=".07"/>
+        <path d="M78 45H142V65C142 82 183 86 183 115V300Q183 324 159 324H61Q37 324 37 300V115C37 86 78 82 78 65Z" fill="url(#glass)" stroke="#b7d4df" stroke-width="2"/>
+        <g clip-path="url(#bottle-clip)">
+          <g id="liquid" transform="translate(0 324)">
+            <path class="wave wave-back" d="M-220 0Q-165 -8 -110 0T0 0T110 0T220 0T330 0T440 0V360H-220Z" fill="#85def6"/>
+            <path class="wave wave-front" d="M-220 0Q-165 7 -110 0T0 0T110 0T220 0T330 0T440 0V360H-220Z" fill="url(#water)"/>
+          </g>
+          <path d="M51 116V293Q51 310 64 310" stroke="#fff" stroke-width="6" opacity=".5" fill="none" stroke-linecap="round"/>
+          <path d="M168 123V291" stroke="#fff" stroke-width="2" opacity=".4" stroke-linecap="round"/>
+          <path d="M151 125H166M157 157H166M151 189H166M157 221H166M151 253H166M157 285H166" stroke="#204963" stroke-width="2" opacity=".18"/>
+        </g>
+        <rect x="72" y="16" width="76" height="33" rx="10" fill="url(#lid)"/>
+        <path d="M84 24V40M94 24V40M104 24V40M114 24V40M124 24V40M134 24V40" stroke="#fff" stroke-width="2" opacity=".13"/>
+        <rect x="75" y="48" width="70" height="7" rx="3" fill="#b6d0dc"/>
+      </svg>
+      <div class="bottle-reading" aria-hidden="true"><strong id="total">0</strong><span>fl oz</span><b id="percentage">0%</b></div>
+    </div>
+    <p class="goal-line"><span id="remaining">150 oz to go</span><span class="dot">·</span><span><span id="goal-display">150</span> oz goal</span></p>
+  </section>
+
+  <section aria-label="Quick add a drink" class="logging">
+    <div class="quick">
+      <button data-type="Water" data-oz="16.9" class="primary"><span>Water</span><strong>+16.9 <small>oz</small></strong></button>
+      <button data-type="Water" data-oz="20"><span>Water</span><strong>+20 <small>oz</small></strong></button>
+      <button data-type="Powerade" data-oz="20"><span>Powerade</span><strong>+20 <small>oz</small></strong></button>
+      <button data-type="Gatorade Zero" data-oz="20"><span>Gatorade Zero</span><strong>+20 <small>oz</small></strong></button>
+    </div>
+    <details id="custom"><summary>Custom drink <span aria-hidden="true">+</span></summary>
+      <form id="form">
+        <label class="drink-field">Drink<input id="type" required value="Water" maxlength="40"></label>
+        <label>Ounces<input id="amount" required type="number" inputmode="decimal" min="0.1" max="500" step="0.1" value="16.9"></label>
+        <label>Finished at<input id="time" required type="time"></label>
+        <button class="primary">Add drink</button>
+      </form>
+    </details>
+  </section>
+
+  <section class="log-panel" aria-labelledby="log-title">
+    <div class="row"><h2 id="log-title">Today’s log</h2><span id="count">0 drinks</span></div>
+    <div id="entries" tabindex="0" aria-label="Drink entries"></div>
+  </section>
+  <details class="settings"><summary>Goal &amp; backups <span aria-hidden="true">+</span></summary>
+    <label class="goal-setting">Goal for this day <span><input id="goal" type="number" inputmode="decimal" min="1" max="500" step="0.1" placeholder="150"> oz</span></label>
+    <p class="hint">Days start at 6 AM. Clearing the goal uses the default of <span id="default-goal">150</span> oz.</p>
+    <div class="backup-actions"><button id="export" class="link">Export CSV</button><button id="backup" class="link">Backup</button><label class="restore link">Restore<input id="restore" type="file" accept="application/json,.json"></label></div>
+    <p class="hint">Your log stays on this device. The goal is a tracking preference.</p>
+  </details>
+  <p id="status" class="status" role="status" aria-live="polite"></p>
+</main>
+<script src="./app.js"></script>
+</body>
+</html>
