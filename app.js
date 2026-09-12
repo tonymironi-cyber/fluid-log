@@ -141,4 +141,16 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden){checkDay(
 window.addEventListener('focus',()=>{checkDay();scheduleDaySwitch();});
 scheduleDaySwitch();
 render();
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+if('serviceWorker' in navigator) {
+  const hadController=Boolean(navigator.serviceWorker.controller);
+  let refreshing=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(hadController&&!refreshing){refreshing=true;window.location.reload();}
+  });
+  const checkForUpdate=()=>{
+    if(navigator.onLine)navigator.serviceWorker.getRegistration().then(reg=>reg?.update()).catch(()=>{});
+  };
+  navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(checkForUpdate).catch(()=>{});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkForUpdate();});
+  window.addEventListener('focus',checkForUpdate);
+}
