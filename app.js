@@ -70,7 +70,7 @@ function render() {
   $('#log-title').textContent = isToday ? 'Today’s log' : 'Daily log';
   $('#today').hidden = isToday;
   $('#count').textContent = es.length+(es.length===1?' drink':' drinks');
-  $('#entries').innerHTML = es.length ? es.map(e=>`<div class="entry"><div><b>${escapeHtml(e.type)}</b><small>${fmt(e.time)}</small></div><span class="oz">${clean(e.amount)} oz</span><button class="delete" data-id="${e.id}" aria-label="Delete ${escapeHtml(e.type)}, ${clean(e.amount)} ounces at ${fmt(e.time)}">×</button></div>`).join('') : '<div class="empty">No drinks yet. Tap a drink to start filling up.</div>';
+  $('#entries').innerHTML = es.length ? es.map(e=>`<div class="entry"><div><b>${escapeHtml(e.type)}</b><small>${fmt(e.time)}</small></div><span class="oz">${clean(e.amount)} oz</span><button class="delete" data-id="${e.id}" aria-label="Delete ${escapeHtml(e.type)}, ${clean(e.amount)} ounces at ${fmt(e.time)}">×</button></div>`).join('') : '<div class="empty"><strong>No drinks logged yet</strong><span>Choose a quick add option to get started.</span></div>';
   save();
 }
 function add(type,amount,time) {
@@ -81,7 +81,29 @@ function add(type,amount,time) {
   render();
   announce(`Added ${clean(oz)} oz ${type.trim()}`);
 }
-$('#form').addEventListener('submit',e=>{e.preventDefault();add($('#type').value,$('#amount').value,$('#time').value);});
+function formError(message) {
+  $('#form-error').textContent = message;
+  $('#form-error').hidden = !message;
+}
+$('#form').addEventListener('invalid',e=>{
+  formError({
+    type: 'Add a drink name.',
+    amount: 'Enter an amount between 0.1 and 500 oz.',
+    time: 'Choose a finish time.'
+  }[e.target.id] || 'Check this field and try again.');
+},true);
+$('#form').addEventListener('input',()=>formError(''));
+$('#form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const type = $('#type').value.trim();
+  if (!type) {
+    formError('Add a drink name.');
+    $('#type').focus();
+    return;
+  }
+  formError('');
+  add(type,$('#amount').value,$('#time').value);
+});
 document.querySelectorAll('[data-oz]').forEach(b=>b.onclick=()=>{
   const t=new Date().toTimeString().slice(0,5);
   $('#time').value=t;
