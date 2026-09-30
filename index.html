@@ -48,7 +48,10 @@
     <p class="goal-line"><span id="remaining">150 oz to go</span><span class="dot">·</span><span><span id="goal-display">150</span> oz goal</span></p>
   </section>
 
-  <section aria-label="Quick add a drink" class="logging">
+  <section aria-labelledby="quick-title" class="logging">
+    <div class="section-heading">
+      <div><h2 id="quick-title">Quick add</h2><p>Log a drink in one tap</p></div>
+    </div>
     <div class="quick">
       <button data-type="Water" data-oz="16.9" class="primary"><span>Water</span><strong>+16.9 <small>oz</small></strong></button>
       <button data-type="Water" data-oz="20"><span>Water</span><strong>+20 <small>oz</small></strong></button>
@@ -60,6 +63,7 @@
         <label class="drink-field">Drink<input id="type" required value="Water" maxlength="40"></label>
         <label>Ounces<input id="amount" required type="number" inputmode="decimal" min="0.1" max="500" step="0.1" value="16.9"></label>
         <label>Finished at<input id="time" required type="time"></label>
+        <p id="form-error" class="form-error" role="alert" hidden></p>
         <button class="primary">Add drink</button>
       </form>
     </details>
@@ -75,7 +79,7 @@
     <div class="backup-actions"><button id="export" class="link">Export CSV</button><button id="backup" class="link">Backup</button><label class="restore link">Restore<input id="restore" type="file" accept="application/json,.json"></label></div>
     <p class="hint">Your log stays on this device. The goal is a tracking preference.</p>
   </details>
-  <p id="status" class="status" role="status" aria-live="polite"></p>
+  <p id="status" class="status" role="status" aria-live="polite" aria-atomic="true"></p>
 </main>
 <script src="./app.js"></script>
 </body>
